@@ -4,6 +4,8 @@ const P = {"p241": {"cn": "Bitcoin", "t": "BTC", "cat": "mainstream", "pt": "The
 
 import { ImageResponse } from '@vercel/og';
 
+export const config = { runtime: 'edge' };
+
 export default function handler(req) {
   const url = new URL(req.url);
   const host = url.host;
