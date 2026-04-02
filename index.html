@@ -276,8 +276,9 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-download" onclick="downloadCard()">&#x2193; Save Image</button>
-      <button class="btn-share-x" onclick="shareX()">Share on &#x1D54F;</button>
+      <button class="btn-download" onclick="copyCardToClipboard()">&#x1F4CB; Copy Card</button>
+      <button class="btn-download" onclick="downloadCard()" style="background:linear-gradient(135deg,#4a9eff,#3080dd)">&#x2193; Save Image</button>
+      <button class="btn-share-x" onclick="shareCardX()">Share on &#x1D54F;</button>
     </div>
   </div>
 </div>
@@ -658,6 +659,33 @@ function updateCard(){
   ctx.fillStyle=accent;
   ctx.fillText(window.location.host,W-260,H-26);
 
+}
+
+function copyCardToClipboard(){
+  const canvas=document.getElementById("shareCanvas");
+  try{
+    canvas.toBlob(function(blob){
+      if(!blob){showToast("Could not copy card");return;}
+      navigator.clipboard.write([new ClipboardItem({"image/png":blob})]).then(function(){
+        showToast("Card copied to clipboard!");
+      }).catch(function(){
+        showToast("Copy not supported — use Save Image instead");
+      });
+    },"image/png");
+  }catch(e){
+    showToast("Copy not supported — use Save Image instead");
+  }
+}
+
+function shareCardX(){
+  copyCardToClipboard();
+  const p=window._currentProfile;if(!p)return;
+  const url=window.location.origin+"/s/"+window._currentDate;
+  const text=p.share_line+"\n\nWhat crypto are you?";
+  setTimeout(function(){
+    showToast("Paste your card into the tweet!");
+    window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(text)+"&url="+encodeURIComponent(url),"_blank");
+  },800);
 }
 
 function shareX(){
