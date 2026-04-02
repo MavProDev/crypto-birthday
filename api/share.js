@@ -1,22 +1,16 @@
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(req) {
+export default function handler(req) {
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id'); // This is the MM-DD date
-  
-  if (!id) {
+  const id = searchParams.get('id');
+
+  // Validate id is strictly MM-DD format to prevent XSS
+  if (!id || !/^\d{2}-\d{2}$/.test(id)) {
     return new Response(null, { status: 302, headers: { Location: '/' } });
   }
-  
-  // Get the base URL for absolute og:image URL (X requires absolute URLs)
+
   const baseUrl = new URL(req.url).origin;
-  const ogImageUrl = `${baseUrl}/api/og?d=${encodeURIComponent(id)}`;
-  const redirectUrl = `${baseUrl}/?d=${encodeURIComponent(id)}`;
-  
-  // Return an HTML page with og:image meta tags
-  // X's crawler will read these, then the user gets redirected to the app
+  const ogImageUrl = `${baseUrl}/api/og?d=${id}`;
+  const redirectUrl = `${baseUrl}/?d=${id}`;
+
   const html = `<!DOCTYPE html>
 <html>
 <head>
